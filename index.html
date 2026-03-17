@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tap2Track — Rhythm to Drum Track</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tonejs/midi@2.0.28/build/Midi.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@magenta/music@1.23.1/es6/core.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@magenta/music@1.23.1/es6/music_vae.js"></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo-mark logo-image-wrap"><img src="assets/ius-logo.png" alt="IUS logo" class="logo-image" /></div>
+        <div class="brand-copy">
+          <div class="kicker">I/US style rhythm lab</div>
+          <h1>Tap2Track</h1>
+          <p class="lede">Turn desk taps, keyboard rhythms, and mic-detected percussive hits into three full drum-track choices with fills, presets, MIDI export, and optional browser ML continuation.</p>
+        </div>
+      </div>
+      <div class="topbar-controls">
+        <button class="btn" id="startAudioBtn">Enable Audio</button>
+        <button class="btn" id="toggleMicBtn">Start Mic</button>
+        <button class="btn" id="clearInputBtn">Clear Input</button>
+        <button class="btn btn-solid" id="generateBtn">Generate 3 Tracks</button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <aside class="content side-column">
+        <section class="panel">
+          <div class="section-head">
+            <h2>Input Capture</h2>
+            <span class="status" id="captureStatus">Idle</span>
+          </div>
+
+          <div class="controls-grid">
+            <label>
+              <span>Genre Mode</span>
+              <select id="genreSelect">
+                <option value="modern-pop">Modern Pop</option>
+                <option value="indie">Indie</option>
+                <option value="hiphop">Hip-Hop</option>
+                <option value="house">House</option>
+                <option value="latin">Latin Percussion</option>
+                <option value="rock">Rock</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Bars</span>
+              <select id="barsSelect">
+                <option value="1">1</option>
+                <option value="2" selected>2</option>
+                <option value="4">4</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Swing</span>
+              <input type="range" id="swingRange" min="0" max="0.3" step="0.01" value="0.04" />
+            </label>
+
+            <label>
+              <span>Density</span>
+              <input type="range" id="densityRange" min="0.3" max="1.4" step="0.01" value="0.95" />
+            </label>
+
+            <label>
+              <span>Detected BPM</span>
+              <input type="number" id="bpmInput" min="50" max="200" value="100" />
+            </label>
+
+            <label>
+              <span>Variation Strength</span>
+              <input type="range" id="variationRange" min="0" max="1" step="0.01" value="0.48" />
+            </label>
+          </div>
+
+          <div class="button-row top-gap">
+            <button class="btn" id="tapBtn">Tap Here</button>
+            <button class="btn" id="recordKeysBtn">Keyboard Capture</button>
+            <button class="btn" id="quantizeBtn">Re-Analyze</button>
+          </div>
+
+          <div class="subpanel">
+            <div class="small-head">
+              <h3>Tap Timeline</h3>
+              <span class="status" id="tapCountStatus">0 taps</span>
+            </div>
+            <div id="tapTimeline" class="timeline"></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
+            <h2>Presets & Export</h2>
+            <span class="status" id="presetStatus">Local</span>
+          </div>
+          <div class="controls-grid">
+            <label class="span-2">
+              <span>Preset Name</span>
+              <input type="text" id="presetNameInput" placeholder="e.g. Desk groove sketch" />
+            </label>
+            <label class="span-2">
+              <span>Saved Presets</span>
+              <select id="presetSelect"></select>
+            </label>
+          </div>
+          <div class="button-row top-gap">
+            <button class="btn" id="savePresetBtn">Save Preset</button>
+            <button class="btn" id="loadPresetBtn">Load Preset</button>
+            <button class="btn" id="deletePresetBtn">Delete Preset</button>
+          </div>
+          <div class="button-row top-gap">
+            <button class="btn btn-solid" id="exportMidiBtn">Export MIDI</button>
+            <button class="btn" id="exportJsonBtn">Export JSON</button>
+          </div>
+        </section>
+
+        <section class="panel shortcuts-panel">
+          <summary>Shortcuts & Tips</summary>
+          <ul class="shortcut-list">
+            <li><strong>T</strong> tap a rhythm</li>
+            <li><strong>Space</strong> play or stop selected track</li>
+            <li><strong>1–3</strong> select a generated track</li>
+            <li><strong>F</strong> apply Fill 1</li>
+            <li><strong>G</strong> apply Fill 2</li>
+            <li><strong>M</strong> start or stop microphone capture</li>
+          </ul>
+        </section>
+      </aside>
+
+      <section class="content main-column">
+        <section class="panel">
+          <div class="section-head">
+            <h2>Rhythm Analysis</h2>
+            <span class="status" id="analysisStatus">Waiting for input</span>
+          </div>
+          <div class="transport-stats">
+            <div><span>BPM</span><strong id="bpmStat">100</strong></div>
+            <div><span>Stability</span><strong id="stabilityStat">—</strong></div>
+            <div><span>Syncopation</span><strong id="syncopationStat">—</strong></div>
+            <div><span>Grid</span><strong id="gridStat">16-step</strong></div>
+          </div>
+          <div class="subpanel">
+            <div class="small-head">
+              <h3>Analysis Notes</h3>
+            </div>
+            <div id="analysisNotes" class="lyrics-box">Tap a pulse or start the mic to build a groove profile.</div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
+            <h2>Generated Tracks</h2>
+            <div class="button-row compact">
+              <button class="btn" id="applyFill1Btn">Add Fill 1</button>
+              <button class="btn" id="applyFill2Btn">Add Fill 2</button>
+              <button class="btn" id="magentaBtn">Optional ML Continue</button>
+            </div>
+          </div>
+          <div id="resultsList" class="results-list"></div>
+        </section>
+
+        <section class="panel bottom-arranger">
+          <div class="section-head">
+            <h2>Step Grid</h2>
+            <span class="status" id="playbackStatus">Stopped</span>
+          </div>
+          <div id="arrangementGrid" class="arrangement-grid"></div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
