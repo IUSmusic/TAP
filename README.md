@@ -1,6 +1,6 @@
 # Tap2Track
 
-Web preview target: GitHub Pages static hosting.
+Web preview: https://iusmusic.github.io/TAP/
 
 ## Overview
 
