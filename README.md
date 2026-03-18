@@ -3,7 +3,7 @@
   <img src="images/license-badge.png" alt="License badge" width="70">
 </a>
 
-# Tap2Track
+# TAP
 
 Web preview: https://iusmusic.github.io/TAP/
 
