@@ -9,7 +9,7 @@ Web preview: https://iusmusic.github.io/TAP/
 
 ## Overview
 
-Tap2Track is a self-contained browser app that turns rhythmic tapping into three generated drum-track choices.
+TAP is a self-contained browser app that turns rhythmic tapping into three generated drum-track choices.
 
 It is designed to work with:
 - desk taps captured as button taps
