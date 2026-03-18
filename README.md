@@ -1,3 +1,8 @@
+
+<a href="LICENSE">
+  <img src="images/license-badge.png" alt="License badge" width="70">
+</a>
+
 # Tap2Track
 
 Web preview: https://iusmusic.github.io/TAP/
@@ -97,3 +102,8 @@ The visual system is intentionally aligned to the `IUSassistant` app:
 ## License
 
 This project includes the I/US-style source-available license text in `LICENSE`.
+
+
+<a href="LICENSE">
+  <img src="images/license-badge.png" alt="License badge" width="70">
+</a>
