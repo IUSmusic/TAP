@@ -99,9 +99,23 @@ The visual system is intentionally aligned to the `IUSassistant` app:
 - `G` apply Fill 2
 - `M` start or stop microphone capture
 
+
 ## License
 
-This project includes the I/US-style source-available license text in `LICENSE`.
+This repository is **source-available**, not open source.
+
+It is licensed under the **I/US Source-Available License 1.0**. You may review the source code and use it for limited private internal evaluation, but redistribution, public derivative distribution, and commercial use are not permitted without prior written permission.
+
+See [LICENSE](./LICENSE) or [LICENSE.md](./LICENSE.md) for the full terms.
+
+## Copyright
+
+Copyright (c) 2026 Pezhman Farhangi
+I/US Music
+
+## Contact
+
+For licensing requests, commercial rights, redistribution requests, or permission to use protected brand assets, prior written permission must be obtained from I/US Music.
 
 
 <a href="LICENSE">
